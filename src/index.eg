@@ -1,0 +1,46 @@
+
+require:
+   react
+
+provide:
+   ReactNode as ENode
+   components
+   component
+   percent as [%]
+
+
+components = {=}
+
+extract{tags, props} =
+   var tag = .span
+   var id = null
+   var classes = if{props.className, {props.className}, {}}
+   tags each
+      R"^\.(.*)"! {_, name} -> classes.push with name
+      R"^#(.*)"! {_, name} -> set id = name
+      x -> set tag = x
+   {tag, id, classes}
+
+ReactNode{tags, props, Array! children} =
+   {tag, id, classes} = extract{tags, props}
+   if id and props.id:
+      throw E.duplicate_id{"Duplicate id: " + id + " " + props.id}
+   props.className = classes.join{" "}
+   if id: props.id = id
+   react.create-element{components[tag] or tag, props, children}
+
+
+macro{ReactNode} percent{#data{x, y}} =
+   let {=> ReactNode} = @deps
+   `[^x % ^y] where ENode = [^ReactNode]`
+
+macro{components, react} component{#data{name and #symbol{s}, body}} =
+   let {=> components, => react} = @deps
+   ```
+   [^name] =
+      class [^name]:
+         ^body
+      temp = [^react].create-class{^=s, [^name].prototype}
+      [^components][^=s] = temp
+      temp
+   ```
