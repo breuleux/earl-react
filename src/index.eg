@@ -2,6 +2,7 @@
 require:
    react
 
+provide = react
 provide:
    ReactNode as ENode
    components
@@ -17,8 +18,8 @@ extract{tags, props} =
    var classes = if{props.className, {props.className}, {}}
    tags each
       R"^\.(.*)"! {_, name} -> classes.push with name
-      R"^#(.*)"! {_, name} -> set id = name
-      x -> set tag = x
+      R"^#(.*)"! {_, name} -> set-var id = name
+      x -> set-var tag = x
    {tag, id, classes}
 
 ReactNode{tags, props, Array! children} =
@@ -40,7 +41,8 @@ macro{components, react} component{#data{name and #symbol{s}, body}} =
    [^name] =
       class [^name]:
          ^body
-      temp = [^react].create-class{^=s, [^name].prototype}
+      [^name].prototype.display-name = ^=s
+      temp = [^react].create-class{[^name].prototype}
       [^components][^=s] = temp
       temp
    ```
