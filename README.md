@@ -6,18 +6,17 @@ earl-react
 React framework.
 
 What follows is the todo list example from React's homepage, rewritten
-with Earl Grey and earl-react:
+with [Earl Grey](http://breuleux.github.io/earl-grey/) and earl-react:
 
 `script.eg`:
 
     require:
        earl-react as React
+       /browser -> document
     
     require-macros:
        earl-react ->
           %, component
-    
-    globals: document
     
     component TodoList:
        render() =
