@@ -4,7 +4,9 @@
   "description": "Earl Grey macros for React",
   "main": "lib/index.js",
   "scripts": {
-    "prepublish": "earl compile -5rvso lib/ src/",
+    "refresh": "earl compile -5vso lib/ src/",
+    "compile": "earl compile -5rvso lib/ src/",
+    "prepublish": "npm run compile",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,10 +24,10 @@
   },
   "homepage": "https://github.com/breuleux/earl-react",
   "dependencies": {
-    "earlgrey-runtime": ">=0.0.7",
+    "earlgrey-runtime": ">=0.0.11",
     "react": "^0.13.2"
   },
   "devDependencies": {
-    "earlgrey": ">=0.0.2"
+    "earlgrey": ">=0.0.13"
   }
 }
