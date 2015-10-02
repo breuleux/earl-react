@@ -1,6 +1,6 @@
 {
   "name": "earl-react",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Earl Grey macros for React",
   "main": "lib/index.js",
   "scripts": {
