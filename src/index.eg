@@ -13,7 +13,7 @@ provide:
 components = {=}
 
 extract{tags, props} =
-   var tag = .span
+   var tag = .div
    var id = null
    var classes = if{props.className, {props.className}, {}}
    tags each
