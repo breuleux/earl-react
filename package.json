@@ -25,10 +25,10 @@
   },
   "homepage": "https://github.com/breuleux/earl-react",
   "dependencies": {
-    "earlgrey-runtime": ">=0.0.11",
-    "react": "^0.13.2"
+    "earlgrey-runtime": ">=0.0.13",
+    "react": "^15.4.2"
   },
   "devDependencies": {
-    "earlgrey": ">=0.0.13"
+    "earlgrey": ">=0.0.14"
   }
 }

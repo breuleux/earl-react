@@ -6,7 +6,7 @@ earl-react
 React framework.
 
 What follows is the todo list example from React's homepage, rewritten
-with [Earl Grey](http://breuleux.github.io/earl-grey/) and earl-react:
+with [Earl Grey](http://earl-grey.io) and earl-react:
 
 `script.eg`:
 

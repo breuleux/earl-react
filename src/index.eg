@@ -5,12 +5,11 @@ require:
 provide = react
 provide:
    ReactNode as ENode
-   components
    component
    percent as [%]
 
 
-components = {=}
+default-components = Object.assign(Object.create(null), react.DOM)
 
 extract{tags, props} =
    var tag = .div
@@ -22,27 +21,89 @@ extract{tags, props} =
       x -> set-var tag = x
    {tag, id, classes}
 
-ReactNode{tags, props, Array! children} =
+ReactNode{tags, props, children} =
    {tag, id, classes} = extract{tags, props}
    if id and props.id:
       throw E.duplicate_id{"Duplicate id: " + id + " " + props.id}
    props.className = classes.join{" "}
    if id: props.id = id
-   react.create-element{components[tag] or tag, props, children}
+   react.create-element{tag, props, *children}
 
 
-macro{ReactNode} percent{#data{x, y}} =
+macro{ReactNode} percent{#data{descr, var contents}} =
+
    let {=> ReactNode} = @deps
-   `[^x % ^y] where ENode = [^ReactNode]`
 
-macro{components, react} component{#data{name and #symbol{s}, body}} =
-   let {=> components, => react} = @deps
+   match @context:
+      #check or #project ->
+         return #nostep{@form}
+      else -> pass
+
+   inner-scope = @scope.fork{}
+   @env.bind{inner-scope, "wrap-quote", #macro{m}} where
+      m{*, `{^x}`} = x
+   wrap{x} =
+      #use{inner-scope, x}
+
+   tags = {}
+   kv = `{=}`
+
+   parse{match whole} =
+      #void{} -> null
+      #symbol{s} ->
+         tags.push with #value{s}
+      #value{String! x} ->
+         tags.push with #value{x}
+      `[. ^[#symbol{x} or #value{String! x}]]` ->
+         tags.push with #value{"." + x}
+      `[# ^[#symbol{x} or #value{String! x}]]` ->
+         tags.push with #value{"#" + x}
+      #send{#symbol{"^"}, #data{#void{}, expr}} ->
+         tags.push with expr
+      `[^_ = ^_]` ->
+         kv.push with whole
+      #send{expr, rest} ->
+         parse{expr}, parse{rest}
+      #multi{*args} or #data{*args} ->
+         args each arg -> parse{arg}
+
+   parse{descr}
+
+   contents = match contents:
+      #void{} -> #array{}
+      #multi{*args} ->
+         xs = {}
+         args each
+            pair and `[^k = ^v]` ->
+               kv.push with pair
+            spl and `[** ^_]` ->
+               kv.push with spl
+            other ->
+               xs.push with wrap{other}
+         #array{*xs}
+      pair and `[^k = ^v]` ->
+         kv.push with pair
+         #array{}
+      x -> #array{wrap{x}}
+
+   resolved-tags = #data{} ++
+      tags each match tag ->
+         #value{key} when default-components[key] ->
+            tag
+         #value{key and R"^[A-Za-z_$]"?} ->
+            @env.mark{#symbol{key}}
+         else ->
+            tag
+
+   `[^ReactNode]{^resolved-tags, ^kv, ^contents}`
+
+
+macro{react} component{#data{name and #symbol{s}, body}} =
+   let {=> react} = @deps
    ```
    [^name] =
       class [^name]:
          ^body
       [^name].prototype.display-name = ^=s
-      temp = [^react].create-class{[^name].prototype}
-      [^components][^=s] = temp
-      temp
+      [^react].create-class{[^name].prototype}
    ```
